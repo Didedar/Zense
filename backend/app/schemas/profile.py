@@ -28,14 +28,3 @@ class ProfileUpdate(BaseModel):
     spending_style: str | None = None
 
 
-class OnboardingComplete(BaseModel):
-    segment: str
-    monthly_income: float
-    goals: list[dict]
-    spending_style: str = "medium"
-
-
-class OnboardingResult(BaseModel):
-    budget_recommendation: dict
-    safe_to_spend_today: float
-    first_actions: list[str]

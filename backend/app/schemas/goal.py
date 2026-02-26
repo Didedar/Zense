@@ -32,6 +32,7 @@ class GoalRead(BaseModel):
     priority: int
     status: str
     category: str
+    last_auto_funded_date: date | None
     created_at: datetime
 
     model_config = {"from_attributes": True}

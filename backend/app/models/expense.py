@@ -20,5 +20,7 @@ class Expense(Base):
     merchant_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_impulse_flag: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_fixed: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    expense_kind: Mapped[str] = mapped_column(String(20), default="variable", server_default="variable")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))

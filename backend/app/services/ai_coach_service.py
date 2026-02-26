@@ -113,19 +113,19 @@ class LLMCoachStub(BaseCoach):
             }
 
         try:
-            from google import genai
+            import logging
+            logger = logging.getLogger(__name__)
+            import google.generativeai as genai
 
-            client = genai.Client(api_key=settings.GEMINI_API_KEY)
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel(settings.GEMINI_MODEL)
             prompt = (
                 f"You are Zense, a friendly financial coach for Gen Z (16-20 years old). "
                 f"Speak simply, warmly, no shaming. Give 1-3 concrete actions. "
                 f"Context: {context}. "
                 f"User question: {message}"
             )
-            response = client.models.generate_content(
-                model=settings.GEMINI_MODEL,
-                contents=prompt,
-            )
+            response = await model.generate_content_async(prompt)
             return {
                 "answer": response.text,
                 "suggested_actions": [],
@@ -133,7 +133,10 @@ class LLMCoachStub(BaseCoach):
                 "source": "llm",
                 "disclaimer": DISCLAIMER,
             }
-        except Exception:
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error calling AI Coach: {e}", exc_info=True)
             return {
                 "answer": "I had trouble connecting to the AI service. Let me give you rule-based advice instead.",
                 "suggested_actions": [],

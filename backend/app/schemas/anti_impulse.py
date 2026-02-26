@@ -25,7 +25,7 @@ class AntiImpulseResolveRequest(BaseModel):
 
 class AntiImpulseSessionRead(BaseModel):
     id: uuid.UUID
-    planned_purchase_amount: Decimal
+    planned_purchase_amount: float
     category: str
     risk_score: int
     cooldown_seconds: int

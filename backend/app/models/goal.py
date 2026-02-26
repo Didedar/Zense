@@ -21,5 +21,6 @@ class Goal(Base):
     priority: Mapped[int] = mapped_column(Integer, default=3)
     status: Mapped[str] = mapped_column(String(20), default="active")
     category: Mapped[str] = mapped_column(String(50), default="custom")
+    last_auto_funded_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))

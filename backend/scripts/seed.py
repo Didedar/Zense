@@ -12,9 +12,8 @@ from app.models.user import User
 from app.models.profile import UserProfile
 from app.models.income import Income
 from app.models.expense import Expense
-from app.models.goal import Goal
 from app.models.goal_contribution import GoalContribution
-from app.models.budget import BudgetPlan, BudgetCategoryLimit
+from app.models.budget import BudgetPlan
 from app.models.report import WeeklyReport
 
 
@@ -115,19 +114,13 @@ async def seed():
             period_start=week_start,
             period_end=week_end,
             total_income_planned=Decimal("35000"),
-            essentials_planned=Decimal("14000"),
-            fun_spending_planned=Decimal("7000"),
+            flexible_planned=Decimal("21000"),
             goal_contribution_planned=Decimal("8750"),
             reserve_planned=Decimal("5250"),
             is_active=True,
         )
         db.add(plan)
         await db.flush()
-
-        for cat, amt in [("food", "5000"), ("transport", "3000"), ("health", "3000"), ("education", "3000")]:
-            db.add(BudgetCategoryLimit(budget_plan_id=plan.id, category=cat, limit_amount=Decimal(amt)))
-        for cat, amt in [("shopping", "2000"), ("entertainment", "2000"), ("subscriptions", "2000"), ("other", "1000")]:
-            db.add(BudgetCategoryLimit(budget_plan_id=plan.id, category=cat, limit_amount=Decimal(amt)))
 
         report = WeeklyReport(
             user_id=user.id,

@@ -6,7 +6,7 @@ from httpx import AsyncClient
 
 @pytest.mark.asyncio
 async def test_create_income(auth_client: AsyncClient):
-    resp = await auth_client.post("/api/v1/incomes/", json={
+    resp = await auth_client.post("/api/v1/incomes", json={
         "amount": "50000",
         "source_type": "scholarship",
         "received_at": datetime.now(UTC).isoformat(),
@@ -19,19 +19,19 @@ async def test_create_income(auth_client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_list_incomes(auth_client: AsyncClient):
-    await auth_client.post("/api/v1/incomes/", json={
+    await auth_client.post("/api/v1/incomes", json={
         "amount": "10000",
         "source_type": "freelance",
         "received_at": datetime.now(UTC).isoformat(),
     })
-    resp = await auth_client.get("/api/v1/incomes/")
+    resp = await auth_client.get("/api/v1/incomes")
     assert resp.status_code == 200
     assert len(resp.json()) >= 1
 
 
 @pytest.mark.asyncio
 async def test_create_expense(auth_client: AsyncClient):
-    resp = await auth_client.post("/api/v1/expenses/", json={
+    resp = await auth_client.post("/api/v1/expenses", json={
         "amount": "5000",
         "category": "food",
         "spent_at": datetime.now(UTC).isoformat(),
@@ -44,19 +44,19 @@ async def test_create_expense(auth_client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_list_expenses(auth_client: AsyncClient):
-    await auth_client.post("/api/v1/expenses/", json={
+    await auth_client.post("/api/v1/expenses", json={
         "amount": "3000",
         "category": "transport",
         "spent_at": datetime.now(UTC).isoformat(),
     })
-    resp = await auth_client.get("/api/v1/expenses/")
+    resp = await auth_client.get("/api/v1/expenses")
     assert resp.status_code == 200
     assert len(resp.json()) >= 1
 
 
 @pytest.mark.asyncio
 async def test_update_expense(auth_client: AsyncClient):
-    create = await auth_client.post("/api/v1/expenses/", json={
+    create = await auth_client.post("/api/v1/expenses", json={
         "amount": "1000",
         "category": "other",
         "spent_at": datetime.now(UTC).isoformat(),
@@ -69,7 +69,7 @@ async def test_update_expense(auth_client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_delete_expense(auth_client: AsyncClient):
-    create = await auth_client.post("/api/v1/expenses/", json={
+    create = await auth_client.post("/api/v1/expenses", json={
         "amount": "500",
         "category": "other",
         "spent_at": datetime.now(UTC).isoformat(),

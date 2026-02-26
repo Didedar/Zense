@@ -7,19 +7,33 @@ from sqlalchemy import and_, select
 from app.core.deps import CurrentUser, DbSession
 from app.models.expense import Expense
 from app.schemas.expense import ExpenseCreate, ExpenseRead, ExpenseUpdate
+from app.services.xp_service import award_xp, check_first_time_bonus
+from app.services.quest_service import update_quest_progress
+from app.services.micro_lesson_service import check_trigger
 
 router = APIRouter(prefix="/expenses", tags=["Expenses"])
 
 
-@router.post("/", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
 async def create_expense(data: ExpenseCreate, user: CurrentUser, db: DbSession):
     expense = Expense(user_id=user.id, **data.model_dump())
     db.add(expense)
     await db.flush()
+
+    # XP, quest, lesson hooks (savepoint-protected — won't break main flow)
+    try:
+        async with db.begin_nested():
+            await award_xp(db, user.id, "expense_logged", source_id=str(expense.id))
+            await check_first_time_bonus(db, user.id, "expense_logged")
+            await update_quest_progress(db, user.id, "expense_logged")
+            await check_trigger(db, user.id, "expense_logged", {"category": data.category, "amount": float(data.amount)})
+    except Exception:
+        pass
+
     return expense
 
 
-@router.get("/", response_model=list[ExpenseRead])
+@router.get("", response_model=list[ExpenseRead])
 async def list_expenses(
     user: CurrentUser,
     db: DbSession,

@@ -1,0 +1,47 @@
+name: zense
+description: Zense — Gen Z financial coaching & budgeting app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Routing
+  go_router: ^14.6.2
+
+  # Network
+  dio: ^5.7.0
+
+  # Storage
+  flutter_secure_storage: ^9.2.3
+  shared_preferences: ^2.3.4
+
+  # UI
+  shimmer: ^3.0.0
+  fl_chart: ^0.70.2
+  google_fonts: ^6.2.1
+
+  # Utils
+  intl: ^0.19.0
+  uuid: ^4.5.1
+  connectivity_plus: ^6.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.14
+  riverpod_generator: ^2.6.3
+  json_serializable: ^6.9.3
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true

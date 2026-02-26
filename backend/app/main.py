@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.routers import auth, profile, incomes, expenses, goals, budgets, simulator, anti_impulse, reports, ai_coach, analytics
+from app.routers import auth, profile, incomes, expenses, goals, budgets, simulator, anti_impulse, reports, ai_coach, analytics, xp, quests, lessons, notifications, disclaimers
 
 
 @asynccontextmanager
@@ -44,6 +44,11 @@ app.include_router(anti_impulse.router, prefix=prefix)
 app.include_router(reports.router, prefix=prefix)
 app.include_router(ai_coach.router, prefix=prefix)
 app.include_router(analytics.router, prefix=prefix)
+app.include_router(xp.router, prefix=prefix)
+app.include_router(quests.router, prefix=prefix)
+app.include_router(lessons.router, prefix=prefix)
+app.include_router(notifications.router, prefix=prefix)
+app.include_router(disclaimers.router, prefix=prefix)
 
 
 @app.exception_handler(Exception)

@@ -23,11 +23,11 @@ async def calculate_purchase_impact(
     plan = plan_result.scalar_one_or_none()
 
     budget_impact = {
-        "remaining_fun_after": max(0, safe_data["remaining_fun_budget"] - float(purchase_amount)),
+        "remaining_fun_after": max(0, safe_data["remaining_spending_budget"] - float(purchase_amount)),
         "budget_utilization_pct": 0,
     }
-    if plan and plan.fun_spending_planned > 0:
-        budget_impact["budget_utilization_pct"] = round(float(purchase_amount) / float(plan.fun_spending_planned) * 100, 1)
+    if plan and plan.flexible_planned > 0:
+        budget_impact["budget_utilization_pct"] = round(float(purchase_amount) / float(plan.flexible_planned) * 100, 1)
 
     goals_result = await db.execute(
         select(Goal).where(and_(Goal.user_id == user_id, Goal.status == "active"))
@@ -62,11 +62,11 @@ async def calculate_purchase_impact(
             "new_estimated_date": new_eta.isoformat() if new_eta else None,
         })
 
-    if not is_safe and float(purchase_amount) > safe_data["remaining_fun_budget"]:
+    if not is_safe and float(purchase_amount) > safe_data["remaining_spending_budget"]:
         recommendation = "postpone"
         reasoning = (
             f"This purchase of {purchase_amount:,.0f} exceeds your safe-to-spend "
-            f"({safe_today:,.0f}) and remaining fun budget ({safe_data['remaining_fun_budget']:,.0f}). "
+            f"({safe_today:,.0f}) and remaining budget ({safe_data['remaining_spending_budget']:,.0f}). "
             f"Consider waiting until next period or finding a cheaper alternative."
         )
     elif not is_safe:

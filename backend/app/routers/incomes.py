@@ -8,19 +8,39 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import CurrentUser, DbSession
 from app.models.income import Income
 from app.schemas.income import IncomeCreate, IncomeRead, IncomeUpdate
+from app.services.xp_service import award_xp, check_first_time_bonus
+from app.services.quest_service import update_quest_progress
+from app.services.micro_lesson_service import check_trigger
+from app.services.budget_service import generate_budget_plan, get_active_budget
 
 router = APIRouter(prefix="/incomes", tags=["Incomes"])
 
 
-@router.post("/", response_model=IncomeRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=IncomeRead, status_code=status.HTTP_201_CREATED)
 async def create_income(data: IncomeCreate, user: CurrentUser, db: DbSession):
     income = Income(user_id=user.id, **data.model_dump())
     db.add(income)
     await db.flush()
+
+    # XP, quest, lesson hooks (savepoint-protected — won't break main flow)
+    try:
+        async with db.begin_nested():
+            await award_xp(db, user.id, "income_logged", source_id=str(income.id))
+            await check_first_time_bonus(db, user.id, "income_logged")
+            await update_quest_progress(db, user.id, "income_logged")
+            await check_trigger(db, user.id, "income_logged", {"source_type": data.source_type, "amount": float(data.amount)})
+    except Exception:
+        pass
+
+    # Recalculate active budget plan limits if it exists, to reflect new liquidity mid-period
+    active_plan = await get_active_budget(db, user.id)
+    if active_plan:
+        await generate_budget_plan(db, user.id, active_plan.period_type)
+
     return income
 
 
-@router.get("/", response_model=list[IncomeRead])
+@router.get("", response_model=list[IncomeRead])
 async def list_incomes(
     user: CurrentUser,
     db: DbSession,
@@ -64,6 +84,11 @@ async def update_income(income_id: uuid.UUID, data: IncomeUpdate, user: CurrentU
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(income, field, value)
     await db.flush()
+    
+    active_plan = await get_active_budget(db, user.id)
+    if active_plan:
+        await generate_budget_plan(db, user.id, active_plan.period_type)
+        
     return income
 
 
@@ -76,3 +101,8 @@ async def delete_income(income_id: uuid.UUID, user: CurrentUser, db: DbSession):
     if not income:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Income not found")
     await db.delete(income)
+    await db.flush()
+    
+    active_plan = await get_active_budget(db, user.id)
+    if active_plan:
+        await generate_budget_plan(db, user.id, active_plan.period_type)

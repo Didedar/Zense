@@ -12,12 +12,16 @@ from app.models.profile import UserProfile
 from app.models.goal import Goal
 from app.models.income import Income
 from app.models.expense import Expense
-from app.models.budget import BudgetPlan, BudgetCategoryLimit
+from app.models.budget import BudgetPlan
 from app.models.goal_contribution import GoalContribution
 from app.models.report import WeeklyReport
 from app.models.ai_coach import AICoachEvent
 from app.models.anti_impulse import AntiImpulseSession
 from app.models.app_event import AppEvent
+from app.models.xp import UserXP, XPTransaction
+from app.models.quest import QuestTemplate, UserQuest
+from app.models.micro_lesson import MicroLesson, UserLessonHistory
+from app.models.notification import Notification
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

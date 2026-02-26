@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 
 async def _setup_budget(client: AsyncClient):
-    await client.post("/api/v1/incomes/", json={
+    await client.post("/api/v1/incomes", json={
         "amount": "100000",
         "source_type": "scholarship",
         "received_at": datetime.now(UTC).isoformat(),
@@ -55,7 +55,7 @@ async def test_budget_health(auth_client: AsyncClient):
 @pytest.mark.asyncio
 async def test_purchase_impact(auth_client: AsyncClient):
     await _setup_budget(auth_client)
-    await auth_client.post("/api/v1/goals/", json={
+    await auth_client.post("/api/v1/goals", json={
         "title": "Test Goal",
         "target_amount": "100000",
         "priority": 1,
@@ -86,12 +86,12 @@ async def test_purchase_impact_large(auth_client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_weekly_report(auth_client: AsyncClient):
-    await auth_client.post("/api/v1/incomes/", json={
+    await auth_client.post("/api/v1/incomes", json={
         "amount": "50000",
         "source_type": "freelance",
         "received_at": datetime.now(UTC).isoformat(),
     })
-    await auth_client.post("/api/v1/expenses/", json={
+    await auth_client.post("/api/v1/expenses", json={
         "amount": "10000",
         "category": "food",
         "spent_at": datetime.now(UTC).isoformat(),
